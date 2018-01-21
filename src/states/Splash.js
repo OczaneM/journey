@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import { centerGameObjects } from '../utils'
 
-export default class extends Phaser.State {
+export default class Splash extends Phaser.State {
   init () {}
 
   preload () {
@@ -14,8 +14,13 @@ export default class extends Phaser.State {
     // load your assets
     //
     this.load.image('mushroom', 'assets/images/mushroom2.png')
-    this.load.image('stella', 'assets/spriteSheets/stella.png')
+    this.load.atlasJSONArray('stella', 'assets/spriteSheets/stella.png', 'assets/spriteSheets/stella.json')
     this.load.image('mediumAsteroid', 'assets/images/asteroid/asteroidMedium.png')
+    this.load.image('bigAsteroid', 'assets/images/asteroid/asteroidBig.png')
+    this.load.image('hugeAsteroid', 'assets/images/asteroid/asteroidHuge.png')
+    this.load.image('smallAsteroid', 'assets/images/asteroid/asteroidSmall.png')
+    this.load.image('stars', 'assets/images/starfield.jpg')
+    this.load.image('blackhole', 'assets/images/blackHole2.png')
   }
 
   create () {
