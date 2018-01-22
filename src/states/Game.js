@@ -18,26 +18,55 @@ export default class Game extends Phaser.State {
 
     this.asteroids = this.game.add.group()
     this.asteroids.enableBody = true
+    this.asteroids.isClicked = false
 
       //generating the space asteroids
-      for (let i = 0; i < 20; i++)
+      for (let i = 0; i < 15; i++)
       {
 
-        let hugeAsteroid = this.asteroids.create(this.game.world.randomX, this.game.world.randomY, 'hugeAsteroid')
+        let hugeAsteroid = this.asteroids.create(this.game.rnd.integerInRange(0, 600), this.game.rnd.integerInRange(0, 600), 'hugeAsteroid')
           hugeAsteroid.scale.set(1.5)
           hugeAsteroid.inputEnabled = true
           hugeAsteroid.input.enableDrag()
           hugeAsteroid.events.onDragStart.add(this.startDrag, this)
           hugeAsteroid.events.onDragStop.add(this.stopDrag, this)
           hugeAsteroid.body.immovable = true
-          hugeAsteroid.body.setCircle(28)
+          hugeAsteroid.body.setCircle(29)
 
       }
 
-      for (let i = 0; i < 20; i++)
+      for (let i = 0; i < 10; i++)
       {
 
-        let smallAsteroid = this.asteroids.create(this.game.world.randomX, this.game.world.randomY, 'smallAsteroid')
+        let bigAsteroid = this.asteroids.create(this.game.rnd.integerInRange(0, 600), this.game.rnd.integerInRange(0, 600), 'bigAsteroid')
+          bigAsteroid.scale.set(1.5)
+          bigAsteroid.inputEnabled = true
+          bigAsteroid.input.enableDrag()
+          bigAsteroid.events.onDragStart.add(this.startDrag, this)
+          bigAsteroid.events.onDragStop.add(this.stopDrag, this)
+          bigAsteroid.body.immovable = true
+          bigAsteroid.body.setCircle(29)
+
+      }
+
+      for (let i = 0; i < 10; i++)
+      {
+
+        let mediumAsteroid = this.asteroids.create(this.game.rnd.integerInRange(0, 650), this.game.rnd.integerInRange(0, 600), 'mediumAsteroid')
+          mediumAsteroid.scale.set(1.5)
+          mediumAsteroid.inputEnabled = true
+          mediumAsteroid.input.enableDrag()
+          mediumAsteroid.events.onDragStart.add(this.startDrag, this)
+          mediumAsteroid.events.onDragStop.add(this.stopDrag, this)
+          mediumAsteroid.body.immovable = true
+          mediumAsteroid.body.setCircle(16)
+
+      }
+
+      for (let i = 0; i < 25; i++)
+      {
+
+        let smallAsteroid = this.asteroids.create(this.game.rnd.integerInRange(0, 650), this.game.rnd.integerInRange(0, 600), 'smallAsteroid')
           smallAsteroid.scale.set(1.5)
           smallAsteroid.inputEnabled = true
           smallAsteroid.input.enableDrag()
@@ -51,7 +80,7 @@ export default class Game extends Phaser.State {
     this.blackHole = this.game.add.sprite(50, this.game.height - 100, 'blackhole')
     this.blackHole.scale.set(1.5)
 
-    this.player = this.game.add.sprite(650, this.game.height - 450, 'stella')
+    this.player = this.game.add.sprite(700, this.game.height - 550, 'stella')
     this.player.scale.set(2)
     this.player.smoothed = false
     this.player.animations.add('idle', [0, 1, 2, 3], 10, true)
@@ -67,6 +96,8 @@ export default class Game extends Phaser.State {
     //  Player physics properties.
     this.player.body.allowGravity = false
     this.player.body.collideWorldBounds = true
+    this.player.isMoving = false
+    this.player.pos = {x: 0, y: 0}
 
     this.game.camera.follow(this.player)
     this.cursors = this.game.input.keyboard.createCursorKeys()
@@ -101,53 +132,72 @@ export default class Game extends Phaser.State {
       this.restart()
     }
 
-    // if (this.checkOverlap(this.asteroids, this.asteriods))
-    // {
-    //   console.log('yep!')
-    // }
-
     this.player.body.velocity.x = 0
     this.player.body.velocity.y = 0
 
-        if (this.cursors.left.isDown)
-        {
-            this.player.body.velocity.x = -150
-            this.player.animations.play('left')
-        }
-        else if (this.cursors.right.isDown)
-        {
-            this.player.body.velocity.x = 150
-            this.player.animations.play('right')
-        }
+    //  only move when you click
+    // if (this.game.input.mousePointer.isDown)
+    // {
+    //   this.player.isMoving = true
+    //   this.player.pos.x = this.game.input.mousePointer.x
+    //   this.player.pos.y = this.game.input.mousePointer.y
+    // }
+
+    // if (this.player.isMoving)
+    // {
+    //     //  400 is the speed it will move towards the mouse
+    //     this.game.physics.arcade.moveToPointer(this.player, 400)
+
+        //  if it's overlapping the mouse, don't move any more
+        if (this.game.input.mousePointer.isDown && !this.asteroids.isClicked) {
+          this.game.physics.arcade.moveToXY(this.player, this.game.input.x, this.game.input.y, 600, 600)
+  }
+    //     if (Phaser.Rectangle.contains(this.player.body, this.game.input.x, this.game.input.y))
+    //     {
+    //         this.player.body.velocity.setTo(0, 0)
+    //         this.player.isMoving = false
+    //     }
+    // }
+    // else
+    // {
+    //     this.player.body.velocity.setTo(0, 0)
+    // }
+
+        // if (this.cursors.left.isDown)
+        // {
+        //     this.player.body.velocity.x = -150
+        //     this.player.animations.play('left')
+        // }
+        // else if (this.cursors.right.isDown)
+        // {
+        //     this.player.body.velocity.x = 150
+        //     this.player.animations.play('right')
+        // }
+        // // else
+        // // {
+        // //   this.player.play('idle')
+
+        // // }
+
+        // else if (this.cursors.up.isDown)
+        // {
+        //   this.player.body.velocity.y = -150
+        // }
+        // else if (this.cursors.down.isDown)
+        // {
+        //   this.player.body.velocity.y = 150
+        // }
         // else
         // {
         //   this.player.play('idle')
-
         // }
 
-        else if (this.cursors.up.isDown)
-        {
-          this.player.body.velocity.y = -150
-        }
-        else if (this.cursors.down.isDown)
-        {
-          this.player.body.velocity.y = 150
-        }
-        else
-        {
-          this.player.play('idle')
-        }
-
 
   }
 
-
-
-  collisionHandler () {
-  //console.log("now in here")
-  }
 
   startDrag (asteroid) {
+    this.asteroids.isClicked = true
     pos.x = asteroid.x
     pos.y = asteroid.y
   }
@@ -160,6 +210,7 @@ export default class Game extends Phaser.State {
       asteroid.x = pos.x
       asteroid.y = pos.y
     }
+    this.asteroids.isClicked = false
   }
 
   restart () {
