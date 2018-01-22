@@ -8,15 +8,6 @@ export default class Game extends Phaser.State {
   preload () {}
 
   create () {
-    const bannerText = 'Phaser + ES6 + Webpack'
-    let banner = this.add.text(this.world.centerX, this.game.height - 80, bannerText, {
-      font: '40px Bangers',
-      fill: '#77BFA3',
-      smoothed: false
-    })
-
-    banner.padding.set(10, 16)
-    banner.anchor.setTo(0.5)
 
     this.game.physics.startSystem(Phaser.Physics.ARCADE)
 
@@ -27,25 +18,19 @@ export default class Game extends Phaser.State {
     this.asteroids.enableBody = true
 
       //generating the space asteroids
-      let asteroidPositions = []
       for (let i = 0; i < 25; i++)
       {
 
-          let x = this.game.world.randomX
-          let y = this.game.world.randomY
-          let pos = {x, y}
-
-          while (x === 650 || y === this.game.height - 350 || asteroidPositions.find(pos => pos === {x, y}))
-          {
-            x = this.game.world.randomX
-            y = this.game.world.randomY
-          }
-
-          asteroidPositions.push(pos)
-          let hugeAsteroid = this.asteroids.create(x, y, 'hugeAsteroid')
+        let hugeAsteroid = this.asteroids.create(this.game.world.randomX, this.game.world.randomY, 'hugeAsteroid')
           hugeAsteroid.scale.set(1.5)
           hugeAsteroid.body.immovable = true
-          hugeAsteroid.body.setCircle(25)
+          hugeAsteroid.body.setCircle(23)
+          hugeAsteroid.inputEnabled = true
+          hugeAsteroid.body.checkCollision.right = true
+          hugeAsteroid.input.enableDrag()
+
+         hugeAsteroid.events.onDragStart.add(this.startDrag, this)
+         //hugeAsteroid.events.onDragStop.add(stopDrag, this)
       }
 
       this.blackHole = this.game.add.sprite(50, this.game.height - 100, 'blackhole')
@@ -70,6 +55,7 @@ export default class Game extends Phaser.State {
     //  Create our physics body - a 28px radius circle. Set the 'false' parameter below to 'true' to enable debugging
     this.game.physics.arcade.enable(this.player)
     this.game.physics.arcade.enable(this.blackHole)
+    this.game.physics.arcade.enable(this.asteroids)
     //this.player.body.setCircle(28)
 
     //  Player physics properties.
@@ -81,15 +67,25 @@ export default class Game extends Phaser.State {
     this.stateText = this.game.add.text(16, 16, 'Move around', { fill: '#ffffff' })
     this.stateText.visible = false
 
+
     this.game.add.existing(this.player)
+
   }
 
   update () {
 
-    // player collides
+    // collisions
     this.hitAsteroid = this.game.physics.arcade.collide(this.player, this.asteroids)
 
     this.hitBlackHole = this.game.physics.arcade.collide(this.player, this.blackHole)
+
+
+
+
+    if (this.hitAsteroid)
+    {
+      this.gameOver()
+    }
 
     if (this.hitBlackHole)
     {
@@ -136,9 +132,20 @@ export default class Game extends Phaser.State {
 
   }
 
+  startDrag (asteroid) {
+    this.asteroidsCollide = this.game.physics.arcade.collide(asteroid, this.asteroids)
+  }
+
   restart () {
     this.player.kill()
     this.stateText.text = 'SUCCESS! \n Click to restart'
+    this.stateText.visible = true
+    this.game.input.onTap.addOnce(() => this.game.state.start('Game'))
+  }
+
+  gameOver () {
+    this.player.kill()
+    this.stateText.text = 'Game Over! \n Click to restart'
     this.stateText.visible = true
     this.game.input.onTap.addOnce(() => this.game.state.start('Game'))
   }

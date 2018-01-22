@@ -19,7 +19,7 @@ export default class Splash extends Phaser.State {
     this.load.image('bigAsteroid', 'assets/images/asteroid/asteroidBig.png')
     this.load.image('hugeAsteroid', 'assets/images/asteroid/asteroidHuge.png')
     this.load.image('smallAsteroid', 'assets/images/asteroid/asteroidSmall.png')
-    this.load.image('stars', 'assets/images/starfield.jpg')
+    this.load.image('stars', 'assets/images/spacebg_small.jpg')
     this.load.image('blackhole', 'assets/images/blackHole2.png')
   }
 
