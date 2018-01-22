@@ -1,0 +1,44 @@
+{"frames": {
+
+"happy1.png":
+{
+	"frame": {"x":0,"y":0,"w":23,"h":25},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":23,"h":25},
+	"sourceSize": {"w":23,"h":25}
+},
+"happy2.png":
+{
+	"frame": {"x":23,"y":0,"w":23,"h":25},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":23,"h":25},
+	"sourceSize": {"w":23,"h":25}
+},
+"happy3.png":
+{
+	"frame": {"x":46,"y":0,"w":23,"h":25},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":23,"h":25},
+	"sourceSize": {"w":23,"h":25}
+},
+"happy4.png":
+{
+	"frame": {"x":69,"y":0,"w":23,"h":25},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":23,"h":25},
+	"sourceSize": {"w":23,"h":25}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "happy-stella.png",
+	"format": "RGBA8888",
+	"size": {"w":92,"h":25},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:4d9be8a7de0c3ccdaceec54eccc56c2f:7fad18d03213aa9340212e035dda93f8:2eeaee261529243a2cfe0bb6fdb20c09$"
+}
+}

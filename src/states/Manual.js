@@ -1,11 +1,11 @@
 import TextButton from '../../assets/extensions/textbutton'
 import Phaser from 'phaser'
 
-export default class Menu extends Phaser.State {
+export default class Manual extends Phaser.State {
 
     create() {
-
-        this.music = this.game.add.audio('menuMusic')
+        this.manualMusic = this.game.add.audio('manualMusic')
+        this.manualMusic.play()
         let starfield = this.game.add.tileSprite(0, 0, 800, 600, 'stars')
         this.title = new Phaser.Text(this.game, this.game.world.centerX, this.game.world.centerY - 200, '', {
             font: '36px Tahoma',
@@ -18,16 +18,17 @@ export default class Menu extends Phaser.State {
             game: this.game,
             x: this.game.world.centerX,
             y: this.game.world.centerY,
-            asset: 'startButton',
+            asset: '',
             overFrame: 0,
             outFrame: 0,
             downFrame: 0,
             upFrame: 0,
-            label: '',
+            label: 'Help Stella reach the Space Vortex\n by moving the asteroids out of the way.\n But be careful - don\'t let Stella crash into an asteroid!',
             style: {
-                font: '16px Verdana',
+                font: '26px arial',
                 fill: 'white',
                 align: 'center'
+
             }
         })
 
@@ -40,8 +41,8 @@ export default class Menu extends Phaser.State {
         // this.start.setDownSound(this.btnDownSound);
 
         this.start.onInputUp.add(()=>{
-            this.music.stop()
-            this.state.start('Manual', this.music)
+            this.manualMusic.stop()
+            this.state.start('Game')
 
         });
 
@@ -49,6 +50,5 @@ export default class Menu extends Phaser.State {
         this.menuPanel.add(this.title)
         this.menuPanel.add(this.start)
 
-        this.music.loopFull()
     }
 }

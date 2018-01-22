@@ -11,6 +11,13 @@ export default class Game extends Phaser.State {
 
   create () {
 
+    this.music = this.game.add.audio('gameMusic')
+    this.hit = this.game.add.sound('hit')
+    this.success = this.game.add.sound('success')
+    this.credits = this.game.add.audio('credits')
+    this.over = this.game.add.sound('gameOver')
+    this.music.loopFull()
+
     this.game.physics.startSystem(Phaser.Physics.ARCADE)
 
     let starfield = this.game.add.tileSprite(0, 0, 800, 600, 'stars')
@@ -85,22 +92,30 @@ export default class Game extends Phaser.State {
     this.blackHole.scale.set(1.5)
 
     this.player = this.game.add.sprite(700, this.game.height - 550, 'stella')
+    this.succesPlayer = this.game.add.sprite(50, this.game.height - 100, 'happy-stella')
+
+    this.succesPlayer.visible = false
     this.player.scale.set(2)
+
+    this.succesPlayer.scale.set(2)
     this.player.smoothed = false
     this.player.animations.add('idle', [0, 1, 2, 3], 10, true)
     this.player.animations.add('left', [4, 5, 6, 7, 8, 9, 10, 11], 10, true)
     this.player.animations.add('right', [12, 13, 14, 15, 16, 17, 18], 10, true)
+    this.succesPlayer.animations.add('celebrate', [0, 1, 2, 3], 10, true)
     this.player.play('idle')
 
     //  Create our physics body - a 28px radius circle. Set the 'false' parameter below to 'true' to enable debugging
     this.game.physics.arcade.enable(this.player)
     this.game.physics.arcade.enable(this.blackHole)
+
+    this.blackHole.body.immovable = true
     //this.player.body.setCircle(28)
 
     //  Player physics properties.
     this.player.body.allowGravity = false
     this.player.body.collideWorldBounds = true
-    this.player.isMoving = false
+    this.player.isMoving = true
     this.player.pos = {x: 0, y: 0}
 
     this.game.camera.follow(this.player)
@@ -127,17 +142,6 @@ export default class Game extends Phaser.State {
 
     this.game.physics.arcade.overlap(this.asteroids, this.asteroids, this.collisionHandler, null, this)
 
-
-    if (this.hitAsteroid)
-    {
-      this.gameOver()
-    }
-
-    if (this.hitBlackHole)
-    {
-      this.restart()
-    }
-
     this.player.body.velocity.x = 0
     this.player.body.velocity.y = 0
 
@@ -155,9 +159,29 @@ export default class Game extends Phaser.State {
     //     this.game.physics.arcade.moveToPointer(this.player, 400)
 
         //  if it's overlapping the mouse, don't move any more
-        if (this.game.input.mousePointer.isDown && !this.asteroids.isClicked) {
+        if (this.game.input.mousePointer.isDown && !this.asteroids.isClicked && this.player.isMoving) {
           this.game.physics.arcade.moveToXY(this.player, this.game.input.x, this.game.input.y, 600, 600)
   }
+
+        if (this.hitAsteroid)
+        {
+
+          this.hit.play('', 0, 0.5)
+          this.hit.onStop.add(this.playGameOver, this)
+          this.player.kill()
+          this.gameOver()
+        }
+
+        if (this.hitBlackHole)
+        {
+          this.player.kill()
+          this.success.play('', 0, 0.5)
+          this.success.onStop.add(this.playCredits, this)
+          this.succesPlayer.visible = true
+          this.succesPlayer.play('celebrate')
+          this.player.isMoving = false
+          this.restart()
+        }
     //     if (Phaser.Rectangle.contains(this.player.body, this.game.input.x, this.game.input.y))
     //     {
     //         this.player.body.velocity.setTo(0, 0)
@@ -219,18 +243,35 @@ export default class Game extends Phaser.State {
     this.asteroids.isClicked = false
   }
 
+  playCredits () {
+    this.credits.play()
+  }
+
+  playGameOver () {
+    this.over.play('', 0, 0.5)
+    this.over.onStop.add(this.playCredits, this)
+  }
+
   restart () {
-    this.player.kill()
     this.stateText.text = 'SUCCESS! \n Score: ' + this.score + ' \nClick to restart'
     this.stateText.visible = true
-    this.game.input.onTap.addOnce(() => this.game.state.start('Game'))
+    this.music.stop()
+    this.player.body.immovable = true
+
+    this.game.input.onTap.addOnce(() => {
+      this.credits.stop()
+      this.game.state.start('Game')
+    })
   }
 
   gameOver () {
-    this.player.kill()
     this.stateText.text = 'Game Over! \n Score: ' + this.score + ' \nClick to restart'
     this.stateText.visible = true
-    this.game.input.onTap.addOnce(() => this.game.state.start('Game'))
+    this.music.stop()
+    this.game.input.onTap.addOnce(() => {
+      this.credits.stop()
+      this.game.state.start('Game')
+    })
   }
 
   checkOverlap (spriteA, spriteB) {

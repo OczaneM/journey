@@ -7,6 +7,7 @@ import SplashState from './states/Splash'
 import GameState from './states/Game'
 import GameOverState from './states/Over'
 import Menu from './states/Menu'
+import Manual from './states/Manual'
 
 import config from './config'
 
@@ -24,6 +25,7 @@ class Game extends Phaser.Game {
     this.state.add('Menu', Menu, false)
     this.state.add('Game', GameState, false)
     this.state.add('Over', GameOverState, false)
+    this.state.add('Manual', Manual, false)
 
     // with Cordova with need to wait that the device is ready so we will call the Boot state in another file
     if (!window.cordova) {
