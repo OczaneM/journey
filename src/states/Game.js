@@ -9,13 +9,24 @@ export default class Game extends Phaser.State {
 
   create () {
 
-    this.game.physics.startSystem(Phaser.Physics.ARCADE)
+    //this.game.physics.startSystem(Phaser.Physics.ARCADE)
+    this.game.physics.startSystem(Phaser.Physics.P2JS)
+    this.game.physics.p2.defaultRestitution = 0.8
+    this.game.physics.p2.setImpactEvents(true)
+
+    //collision groups
+    this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup()
+    this.asteroidCollisionGroup = this.game.physics.p2.createCollisionGroup()
+
+    //make collision groups collide with the world bounds
+    this.game.physics.p2.updateBoundsCollisionGroup()
 
     let starfield = this.game.add.tileSprite(0, 0, 800, 600, 'stars')
     starfield.fixedToCamera = true
 
     this.asteroids = this.game.add.group()
     this.asteroids.enableBody = true
+    this.asteroids.physicsBodyType = Phaser.Physics.P2JS
 
       //generating the space asteroids
       for (let i = 0; i < 25; i++)
@@ -23,26 +34,17 @@ export default class Game extends Phaser.State {
 
         let hugeAsteroid = this.asteroids.create(this.game.world.randomX, this.game.world.randomY, 'hugeAsteroid')
           hugeAsteroid.scale.set(1.5)
-          hugeAsteroid.body.immovable = true
-          hugeAsteroid.body.setCircle(23)
-          hugeAsteroid.inputEnabled = true
-          hugeAsteroid.body.checkCollision.right = true
-          hugeAsteroid.input.enableDrag()
+          //hugeAsteroid.body.immovable = true
+          hugeAsteroid.body.setCircle(43)
+          hugeAsteroid.body.setCollisionGroup(this.asteroidCollisionGroup)
+          //hugeAsteroid.inputEnabled = true
+         // hugeAsteroid.input.enableDrag()
+          hugeAsteroid.body.collides([this.asteroidCollisionGroup, this.playerCollisionGroup])
 
-         hugeAsteroid.events.onDragStart.add(this.startDrag, this)
-         //hugeAsteroid.events.onDragStop.add(stopDrag, this)
       }
 
       this.blackHole = this.game.add.sprite(50, this.game.height - 100, 'blackhole')
       this.blackHole.scale.set(1.5)
-
-
-    // this.player = new Player({
-    //   game: this.game,
-    //   x: 650,
-    //   y: this.game.height - 350,
-    //   asset: 'stella'
-    // })
 
     this.player = this.game.add.sprite(650, this.game.height - 450, 'stella')
     this.player.scale.set(2)
@@ -53,9 +55,12 @@ export default class Game extends Phaser.State {
     this.player.play('idle')
 
     //  Create our physics body - a 28px radius circle. Set the 'false' parameter below to 'true' to enable debugging
-    this.game.physics.arcade.enable(this.player)
-    this.game.physics.arcade.enable(this.blackHole)
-    this.game.physics.arcade.enable(this.asteroids)
+    this.game.physics.p2.enable(this.player, false)
+    this.player.body.fixedRotation = true
+    this.player.body.setCollisionGroup(this.playerCollisionGroup)
+    this.player.body.collides(this.asteroidCollisionGroup, this.hitAsteroid, this)
+    // this.game.physics.arcade.enable(this.player)
+    // this.game.physics.arcade.enable(this.blackHole)
     //this.player.body.setCircle(28)
 
     //  Player physics properties.
@@ -78,8 +83,6 @@ export default class Game extends Phaser.State {
     this.hitAsteroid = this.game.physics.arcade.collide(this.player, this.asteroids)
 
     this.hitBlackHole = this.game.physics.arcade.collide(this.player, this.blackHole)
-
-
 
 
     if (this.hitAsteroid)
@@ -132,8 +135,8 @@ export default class Game extends Phaser.State {
 
   }
 
-  startDrag (asteroid) {
-    this.asteroidsCollide = this.game.physics.arcade.collide(asteroid, this.asteroids)
+  hitAsteroid (body1, body2) {
+    this.gameOver()
   }
 
   restart () {
