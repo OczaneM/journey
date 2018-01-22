@@ -3,48 +3,53 @@ import Phaser from 'phaser'
 import Mushroom from '../sprites/Mushroom'
 import Player from '../sprites/Player'
 
+let pos = {x: 0, y: 0}
+
 export default class Game extends Phaser.State {
   init () {}
   preload () {}
 
   create () {
 
-    //this.game.physics.startSystem(Phaser.Physics.ARCADE)
-    this.game.physics.startSystem(Phaser.Physics.P2JS)
-    this.game.physics.p2.defaultRestitution = 0.8
-    this.game.physics.p2.setImpactEvents(true)
-
-    //collision groups
-    this.playerCollisionGroup = this.game.physics.p2.createCollisionGroup()
-    this.asteroidCollisionGroup = this.game.physics.p2.createCollisionGroup()
-
-    //make collision groups collide with the world bounds
-    this.game.physics.p2.updateBoundsCollisionGroup()
+    this.game.physics.startSystem(Phaser.Physics.ARCADE)
 
     let starfield = this.game.add.tileSprite(0, 0, 800, 600, 'stars')
     starfield.fixedToCamera = true
 
     this.asteroids = this.game.add.group()
     this.asteroids.enableBody = true
-    this.asteroids.physicsBodyType = Phaser.Physics.P2JS
 
       //generating the space asteroids
-      for (let i = 0; i < 25; i++)
+      for (let i = 0; i < 20; i++)
       {
 
         let hugeAsteroid = this.asteroids.create(this.game.world.randomX, this.game.world.randomY, 'hugeAsteroid')
           hugeAsteroid.scale.set(1.5)
-          //hugeAsteroid.body.immovable = true
-          hugeAsteroid.body.setCircle(43)
-          hugeAsteroid.body.setCollisionGroup(this.asteroidCollisionGroup)
-          //hugeAsteroid.inputEnabled = true
-         // hugeAsteroid.input.enableDrag()
-          hugeAsteroid.body.collides([this.asteroidCollisionGroup, this.playerCollisionGroup])
+          hugeAsteroid.inputEnabled = true
+          hugeAsteroid.input.enableDrag()
+          hugeAsteroid.events.onDragStart.add(this.startDrag, this)
+          hugeAsteroid.events.onDragStop.add(this.stopDrag, this)
+          hugeAsteroid.body.immovable = true
+          hugeAsteroid.body.setCircle(28)
 
       }
 
-      this.blackHole = this.game.add.sprite(50, this.game.height - 100, 'blackhole')
-      this.blackHole.scale.set(1.5)
+      for (let i = 0; i < 20; i++)
+      {
+
+        let smallAsteroid = this.asteroids.create(this.game.world.randomX, this.game.world.randomY, 'smallAsteroid')
+          smallAsteroid.scale.set(1.5)
+          smallAsteroid.inputEnabled = true
+          smallAsteroid.input.enableDrag()
+          smallAsteroid.events.onDragStart.add(this.startDrag, this)
+          smallAsteroid.events.onDragStop.add(this.stopDrag, this)
+          smallAsteroid.body.immovable = true
+          smallAsteroid.body.setCircle(10)
+
+      }
+
+    this.blackHole = this.game.add.sprite(50, this.game.height - 100, 'blackhole')
+    this.blackHole.scale.set(1.5)
 
     this.player = this.game.add.sprite(650, this.game.height - 450, 'stella')
     this.player.scale.set(2)
@@ -55,12 +60,8 @@ export default class Game extends Phaser.State {
     this.player.play('idle')
 
     //  Create our physics body - a 28px radius circle. Set the 'false' parameter below to 'true' to enable debugging
-    this.game.physics.p2.enable(this.player, false)
-    this.player.body.fixedRotation = true
-    this.player.body.setCollisionGroup(this.playerCollisionGroup)
-    this.player.body.collides(this.asteroidCollisionGroup, this.hitAsteroid, this)
-    // this.game.physics.arcade.enable(this.player)
-    // this.game.physics.arcade.enable(this.blackHole)
+    this.game.physics.arcade.enable(this.player)
+    this.game.physics.arcade.enable(this.blackHole)
     //this.player.body.setCircle(28)
 
     //  Player physics properties.
@@ -75,6 +76,7 @@ export default class Game extends Phaser.State {
 
     this.game.add.existing(this.player)
 
+
   }
 
   update () {
@@ -83,6 +85,10 @@ export default class Game extends Phaser.State {
     this.hitAsteroid = this.game.physics.arcade.collide(this.player, this.asteroids)
 
     this.hitBlackHole = this.game.physics.arcade.collide(this.player, this.blackHole)
+
+    this.asteroidCollision = this.game.physics.arcade.collide(this.asteroids, this.asteroids)
+
+    this.game.physics.arcade.overlap(this.asteroids, this.asteroids, this.collisionHandler, null, this)
 
 
     if (this.hitAsteroid)
@@ -95,9 +101,9 @@ export default class Game extends Phaser.State {
       this.restart()
     }
 
-    // if (this.checkOverlap(this.player, this.blackHole))
+    // if (this.checkOverlap(this.asteroids, this.asteriods))
     // {
-    //   this.state.start('Over')
+    //   console.log('yep!')
     // }
 
     this.player.body.velocity.x = 0
@@ -113,13 +119,13 @@ export default class Game extends Phaser.State {
             this.player.body.velocity.x = 150
             this.player.animations.play('right')
         }
-        else
-        {
-          this.player.play('idle')
+        // else
+        // {
+        //   this.player.play('idle')
 
-        }
+        // }
 
-        if (this.cursors.up.isDown)
+        else if (this.cursors.up.isDown)
         {
           this.player.body.velocity.y = -150
         }
@@ -135,8 +141,25 @@ export default class Game extends Phaser.State {
 
   }
 
-  hitAsteroid (body1, body2) {
-    this.gameOver()
+
+
+  collisionHandler () {
+  //console.log("now in here")
+  }
+
+  startDrag (asteroid) {
+    pos.x = asteroid.x
+    pos.y = asteroid.y
+  }
+
+  stopDrag (asteroid) {
+    let overlap = false
+    overlap = this.game.physics.arcade.overlap(asteroid, this.asteroids, () => true)
+    if (overlap)
+    {
+      asteroid.x = pos.x
+      asteroid.y = pos.y
+    }
   }
 
   restart () {
@@ -154,7 +177,6 @@ export default class Game extends Phaser.State {
   }
 
   checkOverlap (spriteA, spriteB) {
-
         let boundsA = spriteA.getBounds()
         let boundsB = spriteB.getBounds()
 
