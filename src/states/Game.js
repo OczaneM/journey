@@ -15,6 +15,7 @@ export default class Game extends Phaser.State {
 
     let starfield = this.game.add.tileSprite(0, 0, 800, 600, 'stars')
     starfield.fixedToCamera = true
+    this.scoe = 0
 
     this.asteroids = this.game.add.group()
     this.asteroids.enableBody = true
