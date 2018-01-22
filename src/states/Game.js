@@ -15,7 +15,10 @@ export default class Game extends Phaser.State {
 
     let starfield = this.game.add.tileSprite(0, 0, 800, 600, 'stars')
     starfield.fixedToCamera = true
-    this.scoe = 0
+    this.score = 100000
+
+    this.scoreText = this.game.add.text(16, 16, 'Score: 0', { fill: '#ffffff' })
+    this.scoreText.visible = false
 
     this.asteroids = this.game.add.group()
     this.asteroids.enableBody = true
@@ -112,6 +115,8 @@ export default class Game extends Phaser.State {
   }
 
   update () {
+
+    this.score -= 1
 
     // collisions
     this.hitAsteroid = this.game.physics.arcade.collide(this.player, this.asteroids)
@@ -216,14 +221,14 @@ export default class Game extends Phaser.State {
 
   restart () {
     this.player.kill()
-    this.stateText.text = 'SUCCESS! \n Click to restart'
+    this.stateText.text = 'SUCCESS! \n Score: ' + this.score + ' \nClick to restart'
     this.stateText.visible = true
     this.game.input.onTap.addOnce(() => this.game.state.start('Game'))
   }
 
   gameOver () {
     this.player.kill()
-    this.stateText.text = 'Game Over! \n Click to restart'
+    this.stateText.text = 'Game Over! \n Score: ' + this.score + ' \nClick to restart'
     this.stateText.visible = true
     this.game.input.onTap.addOnce(() => this.game.state.start('Game'))
   }
