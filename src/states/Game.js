@@ -116,7 +116,7 @@ export default class Game extends Phaser.State {
 
   update () {
 
-    this.score -= 1
+    this.score -= 10
 
     // collisions
     this.hitAsteroid = this.game.physics.arcade.collide(this.player, this.asteroids)
