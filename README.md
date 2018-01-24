@@ -38,15 +38,6 @@ This will run a server so you can run the game in a browser. It will also start 
 To run the game, open your browser and enter http://localhost:3000 into the address bar.
 
 
-## Build for deployment:
-
-Run:
-
-```npm run deploy```
-
-This will optimize and minimize the compiled bundle.
-
-
 ## Credits
 Big thanks to these great repos:
 
